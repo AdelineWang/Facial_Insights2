@@ -203,10 +203,8 @@ class Person_Input():
 
     def get_Insights(self, path_to_file):
 
-        image_path = '/Users/adelwang/Documents/Hackery/Gender-Age-Expression/GenderExpression/images/joe-biden.jpg'
-        path_to_file = '/Users/adelwang/Documents/Hackery/Gender-Age-Expression/GenderExpression/images'
-        #image_path = '../images/joe-biden.jpg'
-        #path_to_file = '../GenderExpression/images'
+        #image_path = '/Users/adelwang/Documents/Hackery/Gender-Age-Expression/GenderExpression/images/joe-biden.jpg'
+        #path_to_file = '/Users/adelwang/Documents/Hackery/Gender-Age-Expression/GenderExpression/images'
 
         person = Person_Input(path_to_file)
 
@@ -222,8 +220,12 @@ class Person_Input():
         #pickle.dump(emotion_classifier, file_pi)
         #pickle.dump(gender_classifier, file_pi)
 
+        #Train the model on the first image only.
+        image_to_align = os.listdir(path_to_file)[0]
+        image_to_align_ = join(path_to_file, image_to_align)
 
-        aligned_image, image, rect_nums, XY = person.load_image(image_path, shape_detector)
+        aligned_image, image, rect_nums, XY = person.load_image(image_to_align_, shape_detector)
+
 
         #store the data from each of the 5 photos in array of "jsons" called five_insights
         five_insights = [None]*5
@@ -233,7 +235,8 @@ class Person_Input():
         for f in listdir(path_to_file):
             if isfile(join(path_to_file, f)) and not f.startswith('.') and count is 0:
                 image_path_= join(path_to_file, f)
-                gender, emotion = person.get_emotion(image_path_, face_detection, emotion_classifier, gender_classifier)
+                print(image_path_)
+                emotion, gender = person.get_emotion(image_path_, face_detection, emotion_classifier, gender_classifier)
                 age = person.get_age(aligned_image, shape_detector)
                 #print(gender, emotion, int(age))
                 one_insight = {'age':int(age), 'gender':gender, 'expression':emotion}
@@ -243,6 +246,8 @@ class Person_Input():
         return five_insights
 
 
+#Change this to whereever the directory is saved.
+#This folder will be locally saved. 
 path_to_file = '/Users/adelwang/Documents/Hackery/Gender-Age-Expression/GenderExpression/images'
 print(Person_Input(path_to_file).get_Insights(path_to_file))
 
