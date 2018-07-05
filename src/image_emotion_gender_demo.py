@@ -225,14 +225,13 @@ class Person_Input():
 
         aligned_image, image, rect_nums, XY = person.load_image(image_to_align_, shape_detector)
 
-
         #store the data from each of the 5 photos in array of "jsons" called five_insights
         five_insights = [None]*5
         count = 0
 
         #**For this demo, only look at the first photo. Need to decide how to average data for 5 photos**
         for f in listdir(path_to_file):
-            if isfile(join(path_to_file, f)) and not f.startswith('.') and count is 0:
+            if isfile(join(path_to_file, f)) and not f.startswith('.'):
                 image_path_= join(path_to_file, f)
                 #print(image_path_)
                 emotion, gender = person.get_emotion(image_path_, face_detection, emotion_classifier, gender_classifier)
@@ -242,7 +241,7 @@ class Person_Input():
 
                 five_insights[count] = one_insight
                 #count += 1
-        return five_insight[0]
+        return five_insights
 
 
 #Change this to whereever the directory is saved.
