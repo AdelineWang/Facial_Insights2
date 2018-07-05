@@ -15,7 +15,6 @@ from keras.optimizers import Adam, SGD
 
 from keras.models import load_model
 
-from emotion_model import *
 from utils.datasets import get_labels
 from utils.inference import detect_faces
 from utils.inference import draw_text
