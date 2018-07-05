@@ -235,7 +235,7 @@ class Person_Input():
         for f in listdir(path_to_file):
             if isfile(join(path_to_file, f)) and not f.startswith('.') and count is 0:
                 image_path_= join(path_to_file, f)
-                print(image_path_)
+                #print(image_path_)
                 emotion, gender = person.get_emotion(image_path_, face_detection, emotion_classifier, gender_classifier)
                 age = person.get_age(aligned_image, shape_detector)
                 #print(gender, emotion, int(age))
@@ -243,7 +243,7 @@ class Person_Input():
 
                 five_insights[count] = one_insight
                 #count += 1
-        return five_insights
+        return five_insight[0]
 
 
 #Change this to whereever the directory is saved.
