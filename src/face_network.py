@@ -1,4 +1,4 @@
-import numpy as np
+'''import numpy as np
 
 from keras.engine import  Model
 from keras.layers import Flatten, Dense, Input
@@ -18,4 +18,4 @@ def create_face_network(nb_class=2, hidden_dim=512, shape=(224, 224, 3)):
 	print(custom_vgg_model.summary())
 	return custom_vgg_model
 
-
+'''

@@ -7,7 +7,7 @@ from os import listdir
 import csv
 from os.path import isfile, join
 
-from face_network import create_face_network
+#from face_network import create_face_network
 import cv2
 import argparse
 from keras.optimizers import Adam, SGD
@@ -15,6 +15,7 @@ from keras.optimizers import Adam, SGD
 
 from keras.models import load_model
 
+#from emotion_model import *
 from utils.datasets import get_labels
 from utils.inference import detect_faces
 from utils.inference import draw_text
@@ -79,6 +80,29 @@ class Person_Input():
 
     def __init__(self, path_to_image):
         self.path_to_image = path_to_image
+
+    #for ethnicity/age
+    def load_image(self, image_path, shape_predictor):
+        detector = dlib.get_frontal_face_detector()
+        predictor = dlib.shape_predictor(shape_predictor)
+        fa = FaceAligner(predictor, desiredFaceWidth=160)
+        image = cv2.imread(image_path, cv2.IMREAD_COLOR)
+        #image = imutils.resize(image, width=256)
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        rects = detector(gray, 2)
+        rect_nums = len(rects)
+        XY, aligned_images = [], []
+        if rect_nums == 0:
+            aligned_images.append(image)
+            return aligned_images, image, rect_nums, XY
+        else:
+            for i in range(rect_nums):
+                aligned_image = fa.align(image, gray, rects[i])
+                aligned_images.append(aligned_image)
+                (x, y, w, h) = rect_to_bb(rects[i])
+                image = cv2.rectangle(image, (x, y), (x + w, y + h), color=(255, 0, 0), thickness=2)
+                XY.append((x, y))
+            return np.array(aligned_images), image, rect_nums, XY
 
     def get_emotion(self, image_path_, face_detection, emotion_classifier, gender_classifier):
         #print(face_detection)
@@ -176,37 +200,32 @@ class Person_Input():
         face_detection = load_detection_model(detection_model_path)
         return face_detection
 
-    #for ethnicity/age
-    def load_image(self, image_path, shape_predictor):
-        detector = dlib.get_frontal_face_detector()
-        predictor = dlib.shape_predictor(shape_predictor)
-        fa = FaceAligner(predictor, desiredFaceWidth=160)
-        image = cv2.imread(image_path, cv2.IMREAD_COLOR)
-        # image = imutils.resize(image, width=256)
-        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        rects = detector(gray, 2)
-        rect_nums = len(rects)
-        XY, aligned_images = [], []
-        if rect_nums == 0:
-            aligned_images.append(image)
-            return aligned_images, image, rect_nums, XY
-        else:
-            for i in range(rect_nums):
-                aligned_image = fa.align(image, gray, rects[i])
-                aligned_images.append(aligned_image)
-                (x, y, w, h) = rect_to_bb(rects[i])
-                image = cv2.rectangle(image, (x, y), (x + w, y + h), color=(255, 0, 0), thickness=2)
-                XY.append((x, y))
-            return np.array(aligned_images), image, rect_nums, XY
+    
+
+    def create_face_network(nb_class=2, hidden_dim=512, shape=(224, 224, 3)):
+        # Convolution Features
+        model = VGGFace(include_top=False, input_shape=shape)
+        last_layer = model.get_layer('pool5').output
+        x = Flatten(name='flatten')(last_layer)
+        x = Dense(hidden_dim, activation='relu', name='fc6')(x)
+        x = Dense(hidden_dim, activation='relu', name='fc7')(x)
+        out = Dense(nb_class, activation='softmax', name='fc8')(x)
+        custom_vgg_model = Model(model.input, out)
+
+        print(custom_vgg_model.summary())
+        return custom_vgg_model
+
+
 
 
     def get_Insights(self, path_to_file):
 
         #image_path = '/Users/adelwang/Documents/Hackery/Gender-Age-Expression/GenderExpression/images/joe-biden.jpg'
         #path_to_file = '/Users/adelwang/Documents/Hackery/Gender-Age-Expression/GenderExpression/images'
+        #image_path = '../images/joe-biden.jpg'
+        #path_to_file = '../GenderExpression/images'
 
         person = Person_Input(path_to_file)
-
 
         face_detection = load_detection_model(detection_model_path)
 
@@ -218,9 +237,9 @@ class Person_Input():
         #pickle.dump(emotion_classifier, file_pi)
         #pickle.dump(emotion_classifier, file_pi)
         #pickle.dump(gender_classifier, file_pi)
+        #image_path = os.listdir(path_to_file)
 
-        #Train the model on the first image only.
-        image_to_align = os.listdir(path_to_file)[0]
+        image_to_align = os.listdir(path_to_file)[1]
         image_to_align_ = join(path_to_file, image_to_align)
 
         aligned_image, image, rect_nums, XY = person.load_image(image_to_align_, shape_detector)
@@ -231,10 +250,9 @@ class Person_Input():
 
         #**For this demo, only look at the first photo. Need to decide how to average data for 5 photos**
         for f in listdir(path_to_file):
-            if isfile(join(path_to_file, f)) and not f.startswith('.'):
+            if isfile(join(path_to_file, f)) and not f.startswith('.') and count is 0:
                 image_path_= join(path_to_file, f)
-                #print(image_path_)
-                emotion, gender = person.get_emotion(image_path_, face_detection, emotion_classifier, gender_classifier)
+                gender, emotion = person.get_emotion(image_path_, face_detection, emotion_classifier, gender_classifier)
                 age = person.get_age(aligned_image, shape_detector)
                 #print(gender, emotion, int(age))
                 one_insight = {'age':int(age), 'gender':gender, 'expression':emotion}
@@ -244,8 +262,6 @@ class Person_Input():
         return five_insights
 
 
-#Change this to whereever the directory is saved.
-#This folder will be locally saved. 
-path_to_file = '/Users/adelwang/Documents/Hackery/Gender-Age-Expression/GenderExpression/images'
+path_to_file = '../images'
 print(Person_Input(path_to_file).get_Insights(path_to_file))
 
