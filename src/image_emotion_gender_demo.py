@@ -267,7 +267,7 @@ class Person_Input():
                 gender, emotion = person.get_emotion(image_path_, face_detection, emotion_classifier, gender_classifier)
                 age = person.get_age(aligned_image, shape_detector)
                 #print(gender, emotion, int(age))
-                #one_insight = {'age':int(age), 'gender':gender, 'expression':emotion}
+
                 one_insight = {'age':int(age), 'gender':gender, 'emotion':emotion}
 
 
