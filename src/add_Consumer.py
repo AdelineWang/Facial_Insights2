@@ -9,7 +9,7 @@ import sys
 dir_path = os.path.dirname(os.path.realpath(__file__))
 path_extention = '../traits/src'
 sys.path.insert(0, dir_path + path_extention)
-# from image_emotion_gender_demo import Person_Input <= Import line for adeline's library
+from image_emotion_gender_demo import Person_Input #<= Import line for adeline's library
 
 # GraphQL endpoint
 GraphQL_Endpoint = 'http://35.183.111.132:82/graphql'
@@ -56,4 +56,4 @@ def addFacialInsights(uuid, path):
     client.execute(query, variables)
 
 # Demo Script Call.
-# addConsumer(31, 3, 3, 12345.9, "./FakePath/Image/Face")
+addConsumer(31, 3, 3, 12345.9, "./FakePath/Image/Face")
