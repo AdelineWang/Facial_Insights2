@@ -22,7 +22,7 @@ from utils.inference import draw_text
 from utils.inference import draw_bounding_box
 from utils.inference import apply_offsets
 from utils.inference import load_detection_model
-from utils.inference import load_image
+#from utils.inference import load_image
 from utils.preprocessor import preprocess_input
 from tempfile import TemporaryFile
 from keras.backend import tf as ktf
@@ -80,6 +80,29 @@ class Person_Input():
 
     def __init__(self, path_to_image):
         self.path_to_image = path_to_image
+
+    #for ethnicity/age
+    def load_image(self, image_path, shape_predictor):
+        detector = dlib.get_frontal_face_detector()
+        predictor = dlib.shape_predictor(shape_predictor)
+        fa = FaceAligner(predictor, desiredFaceWidth=160)
+        image = cv2.imread(image_path, cv2.IMREAD_COLOR)
+        #image = imutils.resize(image, width=256)
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        rects = detector(gray, 2)
+        rect_nums = len(rects)
+        XY, aligned_images = [], []
+        if rect_nums == 0:
+            aligned_images.append(image)
+            return aligned_images, image, rect_nums, XY
+        else:
+            for i in range(rect_nums):
+                aligned_image = fa.align(image, gray, rects[i])
+                aligned_images.append(aligned_image)
+                (x, y, w, h) = rect_to_bb(rects[i])
+                image = cv2.rectangle(image, (x, y), (x + w, y + h), color=(255, 0, 0), thickness=2)
+                XY.append((x, y))
+            return np.array(aligned_images), image, rect_nums, XY
 
     def get_emotion(self, image_path_, face_detection, emotion_classifier, gender_classifier):
         #print(face_detection)
@@ -177,28 +200,7 @@ class Person_Input():
         face_detection = load_detection_model(detection_model_path)
         return face_detection
 
-    #for ethnicity/age
-    def load_image(self, image_path, shape_predictor):
-        detector = dlib.get_frontal_face_detector()
-        predictor = dlib.shape_predictor(shape_predictor)
-        fa = FaceAligner(predictor, desiredFaceWidth=160)
-        image = cv2.imread(image_path, cv2.IMREAD_COLOR)
-        # image = imutils.resize(image, width=256)
-        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        rects = detector(gray, 2)
-        rect_nums = len(rects)
-        XY, aligned_images = [], []
-        if rect_nums == 0:
-            aligned_images.append(image)
-            return aligned_images, image, rect_nums, XY
-        else:
-            for i in range(rect_nums):
-                aligned_image = fa.align(image, gray, rects[i])
-                aligned_images.append(aligned_image)
-                (x, y, w, h) = rect_to_bb(rects[i])
-                image = cv2.rectangle(image, (x, y), (x + w, y + h), color=(255, 0, 0), thickness=2)
-                XY.append((x, y))
-            return np.array(aligned_images), image, rect_nums, XY
+    
 
     def create_face_network(nb_class=2, hidden_dim=512, shape=(224, 224, 3)):
         # Convolution Features
@@ -225,23 +227,22 @@ class Person_Input():
 
         person = Person_Input(path_to_file)
 
-
         face_detection = load_detection_model(detection_model_path)
 
         emotion_classifier = load_model(emotion_model_path, compile=False)
 
         gender_classifier = load_model(gender_model_path, compile=False)
-        
-        image_to_align = os.listdir(path_to_file)[0]
-        image_to_align_ = join(path_to_file, image_to_align)
 
         #file_pi = open('filename_pi.obj', 'w')
         #pickle.dump(emotion_classifier, file_pi)
         #pickle.dump(emotion_classifier, file_pi)
         #pickle.dump(gender_classifier, file_pi)
+        #image_path = os.listdir(path_to_file)
 
+        image_to_align = os.listdir(path_to_file)[0]
+        image_to_align_ = join(path_to_file, image_to_align)
 
-        aligned_image, image, rect_nums, XY = person.load_image(image_path, shape_detector)
+        aligned_image, image, rect_nums, XY = person.load_image(image_to_align_, shape_detector)
 
         #store the data from each of the 5 photos in array of "jsons" called five_insights
         five_insights = [None]*5
