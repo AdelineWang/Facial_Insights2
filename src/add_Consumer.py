@@ -56,4 +56,4 @@ def addFacialInsights(uuid, path):
     client.execute(query, variables)
 
 # Demo Script Call.
-addConsumer(31, 3, 3, 12345.9, "./FakePath/Image/Face")
+addConsumer(36, 3, 3, 12345.9, "../images")
