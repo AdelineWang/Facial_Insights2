@@ -239,7 +239,7 @@ class Person_Input():
         #pickle.dump(gender_classifier, file_pi)
         #image_path = os.listdir(path_to_file)
 
-        image_to_align = os.listdir(path_to_file)[0]
+        image_to_align = os.listdir(path_to_file)[1]
         image_to_align_ = join(path_to_file, image_to_align)
 
         aligned_image, image, rect_nums, XY = person.load_image(image_to_align_, shape_detector)
