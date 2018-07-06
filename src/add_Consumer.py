@@ -39,8 +39,8 @@ def addFacialInsights(uuid, path):
     client = GraphQLClient(GraphQL_Endpoint)
 
     query = """
-    mutation AddFacialInsights($uuid:Int!, $facialInsights:inputFaceData!){
-        addFacialInsights(uuid: $uuid, facialInsights: $facialInsights){
+    mutation UpdateFacialInsights($uuid:Int!, $facialInsights:inputFaceData!){
+        updateFacialInsights(uuid: $uuid, facialInsights: $facialInsights){
             uuid
         }
     }
