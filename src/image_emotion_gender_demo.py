@@ -22,7 +22,7 @@ from utils.inference import draw_text
 from utils.inference import draw_bounding_box
 from utils.inference import apply_offsets
 from utils.inference import load_detection_model
-#from utils.inference import load_image
+from utils.inference import load_image
 from utils.preprocessor import preprocess_input
 from tempfile import TemporaryFile
 from keras.backend import tf as ktf
