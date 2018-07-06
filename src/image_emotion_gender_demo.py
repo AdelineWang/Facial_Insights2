@@ -239,8 +239,20 @@ class Person_Input():
         #pickle.dump(gender_classifier, file_pi)
         #image_path = os.listdir(path_to_file)
 
-        image_to_align = os.listdir(path_to_file)[1]
-        image_to_align_ = join(path_to_file, image_to_align)
+        count_image = 0
+
+        image_to_align_ = None
+
+        for f in listdir(path_to_file):
+            if isfile(join(path_to_file, f)) and not f.startswith('.') and count_image is 0:
+                image_to_align_= join(path_to_file, f)
+
+        if image_to_align_ is None:
+            return None
+
+
+        #image_to_align = os.listdir(path_to_file)[1]
+        #image_to_align_ = join(path_to_file, image_to_align)
 
         aligned_image, image, rect_nums, XY = person.load_image(image_to_align_, shape_detector)
 
@@ -255,7 +267,9 @@ class Person_Input():
                 gender, emotion = person.get_emotion(image_path_, face_detection, emotion_classifier, gender_classifier)
                 age = person.get_age(aligned_image, shape_detector)
                 #print(gender, emotion, int(age))
+
                 one_insight = {'age':int(age), 'gender':gender, 'emotion':emotion}
+
 
                 five_insights[count] = one_insight
                 #count += 1
