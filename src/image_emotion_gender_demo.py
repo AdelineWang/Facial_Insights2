@@ -218,8 +218,8 @@ class Person_Input():
 
     def get_Insights(self, path_to_file):
 
-        image_path = '/Users/adelwang/Documents/Hackery/Gender-Age-Expression/GenderExpression/images/joe-biden.jpg'
-        path_to_file = '/Users/adelwang/Documents/Hackery/Gender-Age-Expression/GenderExpression/images'
+        #image_path = '/Users/adelwang/Documents/Hackery/Gender-Age-Expression/GenderExpression/images/joe-biden.jpg'
+        #path_to_file = '/Users/adelwang/Documents/Hackery/Gender-Age-Expression/GenderExpression/images'
         #image_path = '../images/joe-biden.jpg'
         #path_to_file = '../GenderExpression/images'
 
@@ -231,6 +231,9 @@ class Person_Input():
         emotion_classifier = load_model(emotion_model_path, compile=False)
 
         gender_classifier = load_model(gender_model_path, compile=False)
+        
+        image_to_align = os.listdir(path_to_file)[0]
+        image_to_align_ = join(path_to_file, image_to_align)
 
         #file_pi = open('filename_pi.obj', 'w')
         #pickle.dump(emotion_classifier, file_pi)
@@ -258,6 +261,6 @@ class Person_Input():
         return five_insights
 
 
-path_to_file = '/Users/adelwang/Documents/Hackery/Gender-Age-Expression/GenderExpression/images'
+path_to_file = '../images'
 print(Person_Input(path_to_file).get_Insights(path_to_file))
 
